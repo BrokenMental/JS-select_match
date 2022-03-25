@@ -1,0 +1,120 @@
+<html>
+    <head>
+
+    </head>
+    <body>
+        <section>
+            <div>
+                <input type="checkbox" class="kor" id="1" value="나는">
+                <label for="1">나는</label>
+                <input type="checkbox" class="kor" id="2" value="그를">
+                <label for="2">그를</label>
+                <input type="checkbox" class="kor" id="3" value="안다">
+                <label for="3">안다</label>
+            </div>
+            <div>
+                <input type="checkbox" class="eng" id="4" value="I">
+                <label for="4">I</label>
+                <input type="checkbox" class="eng" id="5" value="know">
+                <label for="5">know</label>
+                <input type="checkbox" class="eng" id="6" value="him">
+                <label for="6">him</label>
+            </div>
+            <div>
+                <input type="button" value="선택" onclick="matchingWord();">
+            </div>
+            <div id="print-area">
+                
+            </div>
+        </section>
+        <script>
+            const matchingObj = {};
+            let listNumber = 0;
+
+            const matchingWord = () => {
+                const kors = [...document.getElementsByClassName('kor')].filter(kor => kor.checked);
+                const engs = [...document.getElementsByClassName('eng')].filter(eng => eng.checked);
+                let combineFlg = false;
+
+                const printArea = document.getElementById('print-area');
+                const tempObj = {
+                    kor : [],
+                    eng : []
+                };
+
+                if(kors.length < 1 || engs.length < 1) {
+                    alert('한글과 영어 중 선택되지 않은 항목이 존재합니다.');
+                    return;
+                }
+
+                kors.map((v, i) => {
+                    v.disabled = true;
+                    v.checked = false;
+                    tempObj.kor.push(
+                        {
+                            val : v.value,
+                            key : v.id
+                        }
+                    );
+                });
+                
+                engs.map((v, i) => {
+                    v.disabled = true;
+                    v.checked = false;
+                    tempObj.eng.push(
+                        {
+                            val: v.value,
+                            key: v.id
+                        }
+                    );
+                });
+                
+                matchingObj[listNumber] = tempObj;
+
+                let tempKor = matchingObj[listNumber].kor.map(kor => kor.val).join(' ');
+                let tempEng = matchingObj[listNumber].eng.map(eng => eng.val).join(' ');
+
+                console.log(tempKor, tempEng);
+
+                const newP = document.createElement('p');
+                const newPSpan1 = document.createElement('span');
+                newPSpan1.innerText = tempKor + ' - ' + tempEng;
+                newP.appendChild(newPSpan1);
+
+                const newPBtn = document.createElement('input');
+                newPBtn.type = 'button';
+                newPBtn.value = 'X';
+                newPBtn.id = 'list_'+ listNumber;
+                newPBtn.style.cursor = 'pointer';
+                newPBtn.onclick = e => {
+                    const thisNumb = e.target.id.split('_')[1];
+                    matchingObj[thisNumb].kor.map(kor => {
+                        kors.map(kv => {
+                            if(kv.id === kor.key) {
+                                kv.disabled = false;
+                            }
+                        });
+
+                    });
+                    matchingObj[thisNumb].eng.map(eng => {
+                        engs.map(ev => {
+                            if (ev.id === eng.key) {
+                                ev.disabled = false;
+                            }
+                        });
+                    });
+
+                    //matchingObj.splice(thisNumb, 1);
+                    delete matchingObj[thisNumb];
+
+                    printArea.removeChild(newP);
+                }
+                newP.appendChild(newPBtn);
+
+                printArea.appendChild(newP);
+
+                listNumber++;
+            }
+        </script>
+    </body>
+</html>
